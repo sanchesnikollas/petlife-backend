@@ -1,10 +1,13 @@
 import Fastify from 'fastify';
+import errorHandler from './plugins/errorHandler.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
     logger: opts.logger ?? (process.env.NODE_ENV !== 'test'),
     ...opts,
   });
+
+  app.register(errorHandler);
 
   app.get('/health', async () => {
     return { status: 'ok', timestamp: new Date().toISOString() };
@@ -14,9 +17,9 @@ export function buildApp(opts = {}) {
 }
 
 async function start() {
-  const app = buildApp();
   const port = parseInt(process.env.PORT || '3001', 10);
   const host = '0.0.0.0';
+  const app = buildApp();
 
   try {
     await app.listen({ port, host });
@@ -27,7 +30,10 @@ async function start() {
   }
 }
 
-const currentFile = new URL(import.meta.url).pathname;
-if (process.argv[1] === currentFile) {
+const isMainModule = process.argv[1] &&
+  (process.argv[1] === new URL(import.meta.url).pathname ||
+   process.argv[1].endsWith('/src/server.js'));
+
+if (isMainModule) {
   start();
 }
