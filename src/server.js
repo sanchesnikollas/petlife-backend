@@ -4,6 +4,7 @@ import errorHandler from './plugins/errorHandler.js';
 import authPlugin from './plugins/auth.js';
 import corsPlugin from './plugins/cors.js';
 import rateLimitPlugin from './plugins/rateLimit.js';
+import authRoutes from './routes/auth.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
@@ -11,6 +12,7 @@ export function buildApp(opts = {}) {
     ...opts,
   });
 
+  // Plugins
   app.register(errorHandler);
   app.register(corsPlugin);
   app.register(cookie, {
@@ -18,12 +20,18 @@ export function buildApp(opts = {}) {
     parseOptions: {},
   });
 
+  // Rate limiting (skip in test by default)
   if (process.env.NODE_ENV !== 'test') {
     app.register(rateLimitPlugin);
   }
 
+  // Auth
   app.register(authPlugin);
 
+  // Routes
+  app.register(authRoutes);
+
+  // Health check (public route)
   app.get('/health', async () => {
     return { status: 'ok', timestamp: new Date().toISOString() };
   });
