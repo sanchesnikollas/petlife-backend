@@ -8,6 +8,12 @@ import authRoutes from './routes/auth.js';
 import meRoutes from './routes/me.js';
 import petRoutes from './routes/pets.js';
 import petOwnershipPlugin from './plugins/petOwnership.js';
+import vaccinesRoutes from './routes/vaccines.js';
+import dewormingsRoutes from './routes/dewormings.js';
+import medicationsRoutes from './routes/medications.js';
+import consultationsRoutes from './routes/consultations.js';
+import foodRoutes from './routes/food.js';
+import recordsRoutes from './routes/records.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
@@ -38,6 +44,12 @@ export function buildApp(opts = {}) {
   app.register(authRoutes);
   app.register(meRoutes);
   app.register(petRoutes);
+  app.register(vaccinesRoutes);
+  app.register(dewormingsRoutes);
+  app.register(medicationsRoutes);
+  app.register(consultationsRoutes);
+  app.register(foodRoutes);
+  app.register(recordsRoutes);
 
   // Health check (public route)
   app.get('/health', async () => {
