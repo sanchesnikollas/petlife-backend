@@ -1,5 +1,9 @@
 import Fastify from 'fastify';
+import cookie from '@fastify/cookie';
 import errorHandler from './plugins/errorHandler.js';
+import authPlugin from './plugins/auth.js';
+import corsPlugin from './plugins/cors.js';
+import rateLimitPlugin from './plugins/rateLimit.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
@@ -8,6 +12,17 @@ export function buildApp(opts = {}) {
   });
 
   app.register(errorHandler);
+  app.register(corsPlugin);
+  app.register(cookie, {
+    secret: process.env.JWT_REFRESH_SECRET || 'dev-cookie-secret',
+    parseOptions: {},
+  });
+
+  if (process.env.NODE_ENV !== 'test') {
+    app.register(rateLimitPlugin);
+  }
+
+  app.register(authPlugin);
 
   app.get('/health', async () => {
     return { status: 'ok', timestamp: new Date().toISOString() };
