@@ -5,6 +5,9 @@ import authPlugin from './plugins/auth.js';
 import corsPlugin from './plugins/cors.js';
 import rateLimitPlugin from './plugins/rateLimit.js';
 import authRoutes from './routes/auth.js';
+import meRoutes from './routes/me.js';
+import petRoutes from './routes/pets.js';
+import petOwnershipPlugin from './plugins/petOwnership.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
@@ -28,8 +31,13 @@ export function buildApp(opts = {}) {
   // Auth
   app.register(authPlugin);
 
+  // Plugins
+  app.register(petOwnershipPlugin);
+
   // Routes
   app.register(authRoutes);
+  app.register(meRoutes);
+  app.register(petRoutes);
 
   // Health check (public route)
   app.get('/health', async () => {
