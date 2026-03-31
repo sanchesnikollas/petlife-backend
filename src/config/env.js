@@ -3,7 +3,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3001),
-  DATABASE_URL: z.string().url().default('postgresql://localhost:5432/petlife'),
+  DATABASE_URL: z.string().min(1).default('postgresql://localhost:5432/petlife'),
   JWT_SECRET: z.string().min(10).default('dev-jwt-secret-change-me'),
   JWT_REFRESH_SECRET: z.string().min(10).default('dev-refresh-secret-change-me'),
   R2_ACCOUNT_ID: z.string().default(''),
