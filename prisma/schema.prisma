@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  APPLE
+}
+
+enum Species {
+  DOG
+  CAT
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum FoodType {
+  DRY
+  WET
+  RAW
+  HOMEMADE
+  MIXED
+}
+
+enum HealthStatus {
+  OK
+  DUE_SOON
+  OVERDUE
+}
+
+enum RecordType {
+  VACCINE
+  DEWORMING
+  MEDICATION
+  CONSULTATION
+  EXAM
+  SURGERY
+  NOTE
+}
+
+model User {
+  id               String         @id @default(cuid())
+  name             String
+  email            String         @unique
+  passwordHash     String
+  phone            String?
+  avatarUrl        String?
+  plan             Plan           @default(FREE)
+  provider         AuthProvider   @default(EMAIL)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  refreshToken     String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  pets             Pet[]
+  reminderConfig   ReminderConfig?
+
+  @@map("users")
+}
+
+model Pet {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  species     Species
+  breed       String?
+  birthDate   DateTime?
+  sex         Sex?
+  weight      Float?
+  photo       String?
+  allergies   String[]
+  conditions  String[]
+  microchip   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foodConfig   FoodConfig?
+  vaccines     Vaccine[]
+  dewormings   Deworming[]
+  medications  Medication[]
+  consultations Consultation[]
+  weightEntries WeightEntry[]
+  mealLogs     MealLog[]
+  records      Record[]
+
+  @@index([userId])
+  @@map("pets")
+}
+
+model FoodConfig {
+  id           String   @id @default(cuid())
+  petId        String   @unique
+  brand        String?
+  line         String?
+  type         FoodType @default(DRY)
+  portionGrams Float?
+  mealsPerDay  Int      @default(2)
+  schedule     String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@map("food_configs")
+}
+
+model Vaccine {
+  id       String    @id @default(cuid())
+  petId    String
+  name     String
+  lastDone DateTime
+  nextDue  DateTime?
+  clinic   String?
+  vet      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("vaccines")
+}
+
+model Deworming {
+  id       String    @id @default(cuid())
+  petId    String
+  name     String
+  product  String?
+  lastDone DateTime
+  nextDue  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("dewormings")
+}
+
+model Medication {
+  id        String    @id @default(cuid())
+  petId     String
+  name      String
+  dose      String?
+  frequency String?
+  startDate DateTime
+  duration  String?
+  nextDue   DateTime?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("medications")
+}
+
+model Consultation {
+  id        String   @id @default(cuid())
+  petId     String
+  date      DateTime
+  type      String?
+  clinic    String?
+  vet       String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("consultations")
+}
+
+model WeightEntry {
+  id        String   @id @default(cuid())
+  petId     String
+  date      DateTime
+  value     Float
+  createdAt DateTime @default(now())
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("weight_entries")
+}
+
+model MealLog {
+  id        String   @id @default(cuid())
+  petId     String
+  date      DateTime
+  time      String
+  given     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId, date])
+  @@map("meal_logs")
+}
+
+model Record {
+  id          String     @id @default(cuid())
+  petId       String
+  date        DateTime
+  type        RecordType
+  title       String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  pet         Pet          @relation(fields: [petId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+
+  @@index([petId, type])
+  @@index([petId, date])
+  @@map("records")
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  recordId  String
+  filename  String
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  record Record @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@index([recordId])
+  @@map("attachments")
+}
+
+model ReminderConfig {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  vaccines      Boolean @default(true)
+  medications   Boolean @default(true)
+  food          Boolean @default(true)
+  consultations Boolean @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reminder_configs")
+}
