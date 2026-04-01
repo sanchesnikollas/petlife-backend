@@ -39,6 +39,7 @@ export default async function authRoutes(fastify) {
     return reply.status(201).send({
       data: {
         accessToken,
+        refreshToken,
         user,
       },
     });
@@ -59,6 +60,7 @@ export default async function authRoutes(fastify) {
     return reply.status(200).send({
       data: {
         accessToken,
+        refreshToken,
         user,
       },
     });
@@ -66,7 +68,8 @@ export default async function authRoutes(fastify) {
 
   // POST /auth/refresh
   fastify.post('/auth/refresh', async (request, reply) => {
-    const currentToken = request.cookies.refreshToken;
+    // Accept refresh token from body OR cookie
+    const currentToken = request.body?.refreshToken || request.cookies?.refreshToken;
 
     const { user, accessToken, refreshToken } = await refreshTokens(currentToken);
 
@@ -75,6 +78,7 @@ export default async function authRoutes(fastify) {
     return reply.status(200).send({
       data: {
         accessToken,
+        refreshToken,
         user,
       },
     });
