@@ -18,7 +18,7 @@ import { AppError } from '../plugins/errorHandler.js';
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   path: '/',
   maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
 };
