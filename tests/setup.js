@@ -12,8 +12,10 @@ beforeEach(async () => {
   await prisma.medication.deleteMany();
   await prisma.deworming.deleteMany();
   await prisma.vaccine.deleteMany();
+  await prisma.petRoutine.deleteMany();
   await prisma.foodConfig.deleteMany();
   await prisma.reminderConfig.deleteMany();
+  await prisma.veterinarian.deleteMany();
   await prisma.pet.deleteMany();
   await prisma.user.deleteMany();
 });

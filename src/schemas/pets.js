@@ -12,6 +12,9 @@ export const createPetSchema = z.object({
   microchip: z.string().optional(),
   neutered: z.boolean().optional().default(false),
   neuteredDate: z.string().datetime().optional(),
+  activityLevel: z.enum(['LOW', 'MODERATE', 'HIGH']).optional(),
+  healthPlan: z.string().max(100).optional(),
+  healthPlanNumber: z.string().max(50).optional(),
 });
 
 export const updatePetSchema = createPetSchema.partial();

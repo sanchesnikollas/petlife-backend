@@ -14,6 +14,8 @@ import medicationsRoutes from './routes/medications.js';
 import consultationsRoutes from './routes/consultations.js';
 import foodRoutes from './routes/food.js';
 import recordsRoutes from './routes/records.js';
+import veterinariansRoutes from './routes/veterinarians.js';
+import routineRoutes from './routes/routine.js';
 
 export function buildApp(opts = {}) {
   const app = Fastify({
@@ -50,6 +52,8 @@ export function buildApp(opts = {}) {
   app.register(consultationsRoutes);
   app.register(foodRoutes);
   app.register(recordsRoutes);
+  app.register(veterinariansRoutes);
+  app.register(routineRoutes);
 
   // Health check (public route)
   app.get('/health', async () => {
