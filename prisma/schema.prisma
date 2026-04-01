@@ -86,8 +86,10 @@ model Pet {
   photo       String?
   allergies   String[]
   conditions  String[]
-  microchip   String?
-  createdAt   DateTime  @default(now())
+  microchip    String?
+  neutered     Boolean   @default(false)
+  neuteredDate DateTime?
+  createdAt    DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 

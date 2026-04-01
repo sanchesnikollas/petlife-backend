@@ -10,6 +10,8 @@ export const createPetSchema = z.object({
   allergies: z.array(z.string()).optional().default([]),
   conditions: z.array(z.string()).optional().default([]),
   microchip: z.string().optional(),
+  neutered: z.boolean().optional().default(false),
+  neuteredDate: z.string().datetime().optional(),
 });
 
 export const updatePetSchema = createPetSchema.partial();
